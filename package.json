@@ -15,6 +15,6 @@
     "auto-bind": "^5.0.1",
     "express": "^4.19.2",
     "mongodb": "^6.7.0",
-    "mongoose": "^8.4.1"
+    "mongoose": "^8.4.3"
   }
 }

@@ -13,7 +13,7 @@ class Repository {
             // לדוגמה: אם יש שדות לחיפוש ב-queryParameters, להוסיף אותם לתנאים
             // query = { field1: queryParameters.field1, field2: queryParameters.field2, ... };
         }
-        const res= await this.model.find();
+        const res= await this.model.find({});
         console.log(res);
         return res;
     }

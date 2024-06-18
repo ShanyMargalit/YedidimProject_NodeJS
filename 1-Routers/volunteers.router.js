@@ -15,5 +15,3 @@ router.post('/', controller.insert)
 router.delete('/:id', controller.delete)
 
 export default router;
-// import Student from './models/student.model.js';
-// import connect from './db.js';

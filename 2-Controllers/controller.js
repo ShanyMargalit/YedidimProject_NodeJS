@@ -1,4 +1,4 @@
-import autoBind from "auto-bind";//otherwise this will be undefined
+import autoBind from "auto-bind";
 
 class Controller {
 
