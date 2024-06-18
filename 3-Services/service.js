@@ -12,9 +12,10 @@ class Service {
 
     async getById(id) {
         try {
+            debugger
             //const response = await this.service.getAll(req.query);
             const response = await this.repo.getById(id);
-            return response.json();
+            return response;
         } 
         catch (e) {
             console.log(e);
