@@ -27,7 +27,8 @@ class Repository {
             const result = helpRequests.find(help => help._id == id);
             return result;
 
-        } catch (error) {
+        } 
+        catch (error) {
             throw new Error(`Error fetching help request: ${error.message}`);
         }
     }

@@ -9,8 +9,6 @@ class Controller {
 
     async getAll(req, res, next) {
         try {
-            
-            //const response = await this.service.getAll(req.query);
             const result = await this.service.getAll(req.query);
             return res.status(200).json(result);
         }

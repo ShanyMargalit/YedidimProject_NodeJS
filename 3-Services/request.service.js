@@ -5,8 +5,10 @@ class RequestService extends Service {
     constructor() {
         super(repo);
     }
-    
-    
+
+    async getAll(queryParameters) {
+        return await this.repo.getAll(queryParameters);
+    }
 }
 
 export default new RequestService();

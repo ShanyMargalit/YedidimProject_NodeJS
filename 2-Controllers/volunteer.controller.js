@@ -5,6 +5,7 @@ class VolunteerController extends Controller {
     constructor() {
         super(service);
     }
+    
     async insert(req, res, next) {
         debugger
         try {
