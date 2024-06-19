@@ -26,6 +26,7 @@ class districtRepository extends Repository {
         console.log(res);
         return res;
     }
+    
 }
 
 export default new districtRepository();
