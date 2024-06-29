@@ -1,6 +1,6 @@
 import express from "express";
 import repo from '../4-Repositories/volunteers.repo.js';
-import controller from '../2-Controllers/priorities.controller.js';
+import controller from '../2-Controllers/priority.controller.js';
 
 const router = express.Router();
 

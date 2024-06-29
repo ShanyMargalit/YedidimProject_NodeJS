@@ -1,5 +1,5 @@
 import Controller  from "./controller.js";
-import service from "../3-Services/statuest.rpo.js";
+import service from "../3-Services/status.service.js";
 
 class statuestController extends Controller {
     constructor() {

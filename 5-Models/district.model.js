@@ -6,9 +6,7 @@ const districtSchema = new mongoose.Schema({
     name:String,
     roads:Array,
     cities:Array
-
 });
-
 
 const District = mongoose.model('district', districtSchema);
 
