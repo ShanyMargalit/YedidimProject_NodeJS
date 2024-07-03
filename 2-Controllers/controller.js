@@ -50,7 +50,7 @@ class Controller {
 
         try {
             const response = await this.service.update(id, req.body);
-            return res.status(response.statusCode).json(response);
+            return res.status(response.status).json(response);
         } catch (e) {
             next(e);
         }

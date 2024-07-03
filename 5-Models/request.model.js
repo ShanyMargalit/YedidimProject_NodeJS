@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 // schema
 const requestSchema = new mongoose.Schema({
-    _id: Number,
+    _id: String,
     description: String,
     phone: String,
     numOfPeople: Number,

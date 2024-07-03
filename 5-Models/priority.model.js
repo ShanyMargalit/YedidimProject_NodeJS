@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 //schema
 const prioritiesSchema = new mongoose.Schema({
-    // _id:Number,
+     _id:Number,
     priority:String
  
 });

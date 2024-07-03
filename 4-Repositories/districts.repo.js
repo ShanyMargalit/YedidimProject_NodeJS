@@ -11,27 +11,7 @@ class districtRepository extends Repository {
         this.districName=districName;
         connect();
     }
-    async getById(queryParameters) {
-        debugger
-        if (queryParameters) {
-            const query = { name: queryParameters };
-            // const projection = {  cities: 1, _id: 0 }; // להחזיר רק את שדה הערים
 
-            const location = await this.model.findOne(query);
-
-            if (location) {
-                console.log(location.cities);
-                return location.cities;
-            } else {
-                console.log(`Location with name ${locationName} not found`);
-                return null;
-            }
-
-        }
-        const res = await this.model.find({ statusCode: "001" });
-        console.log(res);
-        return res;
-    }
     async getAll(queryParameters) {
         try {
             debugger
@@ -47,18 +27,20 @@ class districtRepository extends Repository {
                     result = { roads: location.roads };
                 } else if (queryParameters.cities === 'true') {
                     result = { cities: location.cities };
-                } else {
+                } else if(queryParameters.name ==='true') {
                     result = location;
                 }
     
                 console.log(result);
                 return result;
             } else {
-               return await this.model.find();
-                
-                // return location;
-                // console.log(`Location not found`);
-                // return null;
+                try {
+                    const districtNames = await this.model.find({}, { name: 1, _id: 0 }); // מוצא את כל המחוזות עם השדה name בלבד
+                    return districtNames;
+                } catch (err) {
+                    console.error("Error fetching district names:", err);
+                    throw err;
+                }
             }
         } catch (error) {
             console.error('Error retrieving location:', error);

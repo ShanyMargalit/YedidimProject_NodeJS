@@ -135,9 +135,34 @@ class RequestRepository extends Repository {
     constructor() {
         super(Request);
     }
+    async update(id, data) {
+        debugger;
+        try {
+            const codeVolunteer = id;
+            const idReq = data._id;
 
+            // עדכון הבקשה עם הסטטוס החדש וה-codeVolunteer
+            const updatedRequest = await this.model.findByIdAndUpdate(
+                idReq,
+                { $set: { statusCode: '003', codeVolunteer: codeVolunteer } },
+                { new: true }
+            );
+
+            if (!updatedRequest) {
+                return { status: 404, message: 'Request not found.' };
+            }
+
+            return { status: 200, data: updatedRequest };
+        } catch (error) {
+            console.error('Error updating request:', error);
+            return { status: 500, message: 'Internal Server Error' };
+        }
+    }
     async getAll(queryParameters) {
         const aggregationPipeline = [
+            {
+                $match: { statusCode: "001" } // תנאי סינון בסיסי
+            },
             {
                 $lookup: {
                     from: 'locations', // שם הקולקציה של המיקומים
@@ -155,7 +180,7 @@ class RequestRepository extends Repository {
             {
                 $lookup: {
                     from: 'districts',
-                    localField: 'districtCode',
+                    localField: 'locationDetails.districtCode', // שדה districtCode בתוך locationDetails
                     foreignField: '_id',
                     as: 'districtDetails'
                 }
@@ -168,7 +193,9 @@ class RequestRepository extends Repository {
             },
             {
                 $addFields: {
-                    district: '$districtDetails.Name'
+                    road: '$locationDetails.road', // הוספת העיר
+                    city: '$locationDetails.city', //
+                    district: '$districtDetails.name' // הוספת שם המחוז
                 }
             },
             {
@@ -209,24 +236,27 @@ class RequestRepository extends Repository {
                     status: '$statusDetails.statusName' // להוסיף את statusName כ-status
                 }
             },
+            // שלב הוספת נקודת בקרה לוודא שהשדות קיימים
             {
                 $project: {
-                    locationCode: 0,
-                    // statusCode: 0,
-                    'locationDetails._id': 0, // להסתיר את ה-_id של locationDetails אם נדרש
-                    statusDetails: 0,
-                    priorityDetails: 0 
+                    _id: 1, // להצגת מזהה הזריקה
+                    description: 1, // הצגת תיאור הזריקה
+                    phone: 1, // הצגת מספר טלפון
+                    stuckPeople: 1, // הצגת מספר האנשים התקועים
+                    status: 1, // הצגת שם הסטטוס
+                    priority: 1, // הצגת העדיפות
+                    city: 1, // הצגת העיר
+                    road: 1, // 
+                    district: 1, // הצגת המחוז
+                   
                 }
-            },
-            {
-                $match: { statusCode: "001" } // תנאי סינון בסיסי
             }
         ];
-
+    
         // להוסיף תנאים לחיפוש אם נדרש
         if (queryParameters) {
             const matchConditions = {};
-
+    
             if (queryParameters.statusCode) {
                 matchConditions.statusCode = queryParameters.statusCode;
             }
@@ -242,16 +272,16 @@ class RequestRepository extends Repository {
             if (queryParameters.districtCode) {
                 matchConditions['locationDetails.districtCode'] = queryParameters.districtCode;
             }
-
+    
             if (Object.keys(matchConditions).length > 0) {
                 aggregationPipeline.push({
                     $match: matchConditions
                 });
             }
         }
-
+    
         const res = await this.model.aggregate(aggregationPipeline).exec();
-        console.log(res);
+        console.log(JSON.stringify(res, null, 2)); // הצגת התוצאות בדיבוג
         return res;
     }
 }
