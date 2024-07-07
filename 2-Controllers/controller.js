@@ -47,7 +47,6 @@ class Controller {
 
     async update(req, res, next) {
         const { id } = req.params;
-
         try {
             const response = await this.service.update(id, req.body);
             return res.status(response.status).json(response);
@@ -58,7 +57,6 @@ class Controller {
 
     async delete(req, res, next) {
         const { id } = req.params;
-
         try {
             const response = await this.service.delete(id);
             return res.status(response.statusCode).json(response);
