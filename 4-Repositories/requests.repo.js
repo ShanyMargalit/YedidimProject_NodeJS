@@ -1,4 +1,3 @@
-
 import Repository from "./repository.js";
 import Request from "../5-Models/request.model.js";
 
@@ -6,13 +5,12 @@ class RequestRepository extends Repository {
     constructor() {
         super(Request);
     }
+
     async update(id, data) {
-        debugger;
         try {
             const codeVolunteer = id;
             const idReq = data._id;
 
-            // עדכון הבקשה עם הסטטוס החדש וה-codeVolunteer
             const updatedRequest = await this.model.findByIdAndUpdate(
                 idReq,
                 { $set: { statusCode: '002', codeVolunteer: codeVolunteer } },
@@ -29,16 +27,21 @@ class RequestRepository extends Repository {
             return { status: 500, message: 'Internal Server Error' };
         }
     }
+
     async getAll(queryParameters) {
+        const baseMatch = {
+            statusCode: "001"
+        };
+
         const aggregationPipeline = [
             {
-                $match: { statusCode: "001" } // תנאי סינון בסיסי
+                $match: baseMatch
             },
             {
                 $lookup: {
-                    from: 'locations', // שם הקולקציה של המיקומים
-                    localField: 'locationCode', // השדה בקולקציית הבקשות שמצביע על הקוד במיקומים
-                    foreignField: '_id', // השדה בקולקציית המיקומים שמתאים לקוד
+                    from: 'locations',
+                    localField: 'locationCode',
+                    foreignField: '_id',
                     as: 'locationDetails'
                 }
             },
@@ -51,7 +54,7 @@ class RequestRepository extends Repository {
             {
                 $lookup: {
                     from: 'districts',
-                    localField: 'locationDetails.districtCode', // שדה districtCode בתוך locationDetails
+                    localField: 'locationDetails.districtCode',
                     foreignField: '_id',
                     as: 'districtDetails'
                 }
@@ -64,16 +67,16 @@ class RequestRepository extends Repository {
             },
             {
                 $addFields: {
-                    road: '$locationDetails.road', // הוספת הכביש
-                    city: '$locationDetails.city', //הוספת העיר 
-                    district: '$districtDetails.name' // הוספת שם המחוז
+                    road: '$locationDetails.road',
+                    city: '$locationDetails.city',
+                    district: '$districtDetails.name'
                 }
             },
             {
                 $lookup: {
-                    from: 'priorities', // שם הקולקציה של העדיפויות
-                    localField: 'priorityCode', // השדה בקולקציית הבקשות שמצביע על קוד העדיפות
-                    foreignField: '_id', // השדה בקולקציית העדיפויות שמתאים לקוד העדיפות
+                    from: 'priorities',
+                    localField: 'priorityCode',
+                    foreignField: '_id',
                     as: 'priorityDetails'
                 }
             },
@@ -85,14 +88,14 @@ class RequestRepository extends Repository {
             },
             {
                 $addFields: {
-                    priority: '$priorityDetails.priority' 
+                    priority: '$priorityDetails.priority'
                 }
             },
             {
                 $lookup: {
-                    from: 'statuses', // שם הקולקציה של הסטטוסים
-                    localField: 'statusCode', // השדה בקולקציית הבקשות שמצביע על קוד הסטטוס
-                    foreignField: '_id', // השדה בקולקציית הסטטוסים שמתאים לקוד הסטטוס
+                    from: 'statuses',
+                    localField: 'statusCode',
+                    foreignField: '_id',
                     as: 'statusDetails'
                 }
             },
@@ -104,30 +107,27 @@ class RequestRepository extends Repository {
             },
             {
                 $addFields: {
-                    status: '$statusDetails.statusName' // להוסיף את statusName כ-status
+                    status: '$statusDetails.statusName'
                 }
             },
-            // שלב הוספת נקודת בקרה לוודא שהשדות קיימים
             {
                 $project: {
-                    _id: 1, // להצגת מזהה הזריקה
-                    description: 1, // הצגת תיאור הזריקה
-                    phone: 1, // הצגת מספר טלפון
-                    stuckPeople: 1, // הצגת מספר האנשים התקועים
-                    status: 1, // הצגת שם הסטטוס
-                    priority: 1, // הצגת העדיפות
-                    city: 1, // הצגת העיר
-                    road: 1, // 
-                    district: 1, // הצגת המחוז
-                   
+                    _id: 1,
+                    description: 1,
+                    phone: 1,
+                    stuckPeople: 1,
+                    status: 1,
+                    priority: 1,
+                    city: 1,
+                    road: 1,
+                    district: 1
                 }
             }
         ];
-    
-        // להוסיף תנאים לחיפוש אם נדרש
+
         if (queryParameters) {
             const matchConditions = {};
-    
+
             if (queryParameters.statusCode) {
                 matchConditions.statusCode = queryParameters.statusCode;
             }
@@ -135,24 +135,25 @@ class RequestRepository extends Repository {
                 matchConditions.priorityCode = queryParameters.priorityCode;
             }
             if (queryParameters.city) {
-                matchConditions['locationDetails.city'] = queryParameters.city;
+                matchConditions.city = queryParameters.city;
             }
             if (queryParameters.road) {
-                matchConditions['locationDetails.road'] = queryParameters.road;
+                matchConditions.road = queryParameters.road;
             }
-            if (queryParameters.districtCode) {
-                matchConditions['locationDetails.districtCode'] = queryParameters.districtCode;
+            if (queryParameters.district) {
+                matchConditions.district = queryParameters.district;
             }
-    
+
             if (Object.keys(matchConditions).length > 0) {
+                console.log('Applying match conditions:', matchConditions);
                 aggregationPipeline.push({
                     $match: matchConditions
                 });
             }
         }
-    
+
         const res = await this.model.aggregate(aggregationPipeline).exec();
-        console.log(JSON.stringify(res, null, 2)); // הצגת התוצאות בדיבוג
+        console.log('Aggregation result:', JSON.stringify(res, null, 2));
         return res;
     }
 }
