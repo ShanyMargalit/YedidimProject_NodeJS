@@ -124,15 +124,15 @@ class RequestRepository extends Repository {
                 }
             }
         ];
-
+       debugger
         if (queryParameters) {
             const matchConditions = {};
 
-            if (queryParameters.statusCode) {
-                matchConditions.statusCode = queryParameters.statusCode;
+            if (queryParameters.status) {
+                matchConditions.status = queryParameters.status;
             }
-            if (queryParameters.priorityCode) {
-                matchConditions.priorityCode = queryParameters.priorityCode;
+            if (queryParameters.priority) {
+                matchConditions.priority = queryParameters.priority;
             }
             if (queryParameters.city) {
                 matchConditions.city = queryParameters.city;
